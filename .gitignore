@@ -1,0 +1,15 @@
+# API 키와 관련된 파일들
+.env
+.streamlit/
+secrets.toml
+
+# 파이썬 캐시 파일들
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 가상환경 (만약 사용한다면)
+venv/
+env/
+.venv/
