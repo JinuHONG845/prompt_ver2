@@ -11,7 +11,7 @@ anthropic_client = Anthropic(api_key=st.secrets["ANTHROPIC_API_KEY"])
 genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
 
 # 전역 변수로 categories 정의
-categories = ['정확성', '창의성', '논리성', '완성도', '유용성']
+categories = ['정확성', '창의성', '논리성', '완성도', '유용성', '정확성']
 
 # 전역 변수로 색상 정의
 CHART_COLORS = {
@@ -89,9 +89,9 @@ def create_radar_chart(scores, model_name):
     return fig
 
 def evaluate_response(response_text):
-    # 실제 프로덕션에서는 이 부분을 더 정교한 평가 로직으로 대체해야 합니다
-    # 현재는 예시로 랜덤 점수를 생성합니다
-    return np.random.uniform(6, 10, 5)
+    # 5개의 점수를 생성하고 첫 번째 점수를 마지막에 반복
+    scores = np.random.uniform(6, 10, 5)
+    return np.append(scores, scores[0])  # 첫 번째 점수를 마지막에 추가
 
 def get_evaluation_prompt(responses):
     return f"""다음은 동일한 질문에 대한 세 AI 모델의 응답입니다. 각 응답을 객관적으로 평가해주세요.
