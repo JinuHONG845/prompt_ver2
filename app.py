@@ -10,6 +10,9 @@ openai_client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 anthropic_client = Anthropic(api_key=st.secrets["ANTHROPIC_API_KEY"])
 genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
 
+# 전역 변수로 categories 정의
+categories = ['정확성', '창의성', '논리성', '완성도', '유용성']
+
 def get_gpt4_response(prompt):
     try:
         response = openai_client.chat.completions.create(
@@ -42,13 +45,11 @@ def get_gemini_response(prompt):
         return f"Gemini Error: {str(e)}"
 
 def create_radar_chart(scores, model_name):
-    categories = ['정확성', '창의성', '논리성', '완성도', '유용성']
-    
     fig = go.Figure()
     
     fig.add_trace(go.Scatterpolar(
         r=scores,
-        theta=categories,
+        theta=categories,  # 전역 변수 사용
         fill='toself',
         name=model_name
     ))
