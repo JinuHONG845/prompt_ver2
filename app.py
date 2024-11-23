@@ -71,6 +71,59 @@ def evaluate_response(response_text):
     # 현재는 예시로 랜덤 점수를 생성합니다
     return np.random.uniform(6, 10, 5)
 
+def get_evaluation_prompt(responses):
+    return f"""다음은 동일한 질문에 대한 세 AI 모델의 응답입니다. 각 응답을 객관적으로 평가해주세요.
+
+질문: {responses['prompt']}
+
+GPT-4o의 응답:
+{responses['gpt4']}
+
+Claude-3.5의 응답:
+{responses['claude']}
+
+Gemini Pro의 응답:
+{responses['gemini']}
+
+세 모델의 응답을 비교 분석하여 3줄로 간단히 총평해주세요. 각 모델의 장단점을 객관적으로 평가해주세요."""
+
+async def get_summary_evaluation(model_name, responses):
+    evaluation_prompt = get_evaluation_prompt(responses)
+    
+    if model_name == "GPT-4o":
+        response = await openai.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요."},
+                {"role": "user", "content": evaluation_prompt}
+            ],
+            temperature=0.7,
+            max_tokens=200
+        )
+        return response.choices[0].message.content
+
+    elif model_name == "Claude-3.5":
+        response = await client.messages.create(
+            model="claude-3-sonnet-20240229",
+            max_tokens=200,
+            temperature=0.7,
+            system="당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요.",
+            messages=[{"role": "user", "content": evaluation_prompt}]
+        )
+        return response.content[0].text
+
+    else:  # Gemini Pro
+        response = model.generate_content(
+            prompt=f"""당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요.
+
+{evaluation_prompt}""",
+            generation_config=genai.types.GenerationConfig(
+                temperature=0.7,
+                max_output_tokens=200,
+            )
+        )
+        return response.text
+
 def main():
     # CSS로 레이아웃 조정
     st.markdown("""
@@ -145,6 +198,18 @@ def main():
             fig_gpt.add_trace(go.Scatterpolar(r=gpt4_scores_gemini, theta=categories, fill='toself', name='Gemini Pro'))
             fig_gpt.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 10])), title="GPT-4o의 평가 결과")
             st.plotly_chart(fig_gpt, use_container_width=True)
+            
+            # GPT-4o의 총평 추가
+            st.markdown("#### GPT-4o의 총평")
+            responses = {
+                'prompt': prompt,
+                'gpt4': gpt4_response,
+                'claude': claude_response,
+                'gemini': gemini_response
+            }
+            with st.spinner("GPT-4o가 평가 중..."):
+                gpt4_evaluation = await get_summary_evaluation("GPT-4o", responses)
+                st.markdown(gpt4_evaluation)
 
             # Claude의 평가
             st.markdown("### Claude-3.5의 평가")
@@ -158,6 +223,12 @@ def main():
             fig_claude.add_trace(go.Scatterpolar(r=claude_scores_gemini, theta=categories, fill='toself', name='Gemini Pro'))
             fig_claude.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 10])), title="Claude-3.5의 평가 결과")
             st.plotly_chart(fig_claude, use_container_width=True)
+            
+            # Claude의 총평 추가
+            st.markdown("#### Claude-3.5의 총평")
+            with st.spinner("Claude-3.5가 평가 중..."):
+                claude_evaluation = await get_summary_evaluation("Claude-3.5", responses)
+                st.markdown(claude_evaluation)
 
             # Gemini의 평가
             st.markdown("### Gemini Pro의 평가")
@@ -171,6 +242,12 @@ def main():
             fig_gemini.add_trace(go.Scatterpolar(r=gemini_scores_gemini, theta=categories, fill='toself', name='Gemini Pro'))
             fig_gemini.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 10])), title="Gemini Pro의 평가 결과")
             st.plotly_chart(fig_gemini, use_container_width=True)
+            
+            # Gemini의 총평 추가
+            st.markdown("#### Gemini Pro의 총평")
+            with st.spinner("Gemini Pro가 평가 중..."):
+                gemini_evaluation = await get_summary_evaluation("Gemini Pro", responses)
+                st.markdown(gemini_evaluation)
 
             # 평가 기준 설명
             st.subheader("평가 기준 설명")
