@@ -82,9 +82,9 @@ def main():
                 with st.spinner("Claude 응답 생성 중..."):
                     response = get_claude_response(prompt)
                     full_response = ""
-                    for chunk in response:
-                        if chunk.delta.text:
-                            full_response += chunk.delta.text
+                    for message in response:
+                        if message.type == 'content_block_delta':
+                            full_response += message.delta.text
                             response_container.markdown(full_response)
             
             with col3:
