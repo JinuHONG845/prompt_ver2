@@ -61,41 +61,36 @@ def main():
     
     if st.button("응답 생성"):
         if prompt:
-            col1, col2, col3 = st.columns(3)
-            
-            with col1:
-                st.subheader("GPT-4o")
-                response_container = st.empty()
-                with st.spinner("GPT-4o 응답 생성 중..."):
-                    response = get_gpt4_response(prompt)
-                    full_response = ""
-                    for chunk in response:
-                        if hasattr(chunk.choices[0].delta, 'content'):
-                            content = chunk.choices[0].delta.content
-                            if content:
-                                full_response += content
-                                response_container.markdown(full_response)
-            
-            with col2:
-                st.subheader("Claude-3.5")
-                response_container = st.empty()
-                with st.spinner("Claude 응답 생성 중..."):
-                    response = get_claude_response(prompt)
-                    full_response = ""
-                    for message in response:
-                        if message.type == 'content_block_delta':
-                            full_response += message.delta.text
+            st.subheader("GPT-4")
+            response_container = st.empty()
+            with st.spinner("GPT-4 응답 생성 중..."):
+                response = get_gpt4_response(prompt)
+                full_response = ""
+                for chunk in response:
+                    if hasattr(chunk.choices[0].delta, 'content'):
+                        content = chunk.choices[0].delta.content
+                        if content:
+                            full_response += content
                             response_container.markdown(full_response)
             
-            with col3:
-                st.subheader("Gemini Pro")
-                response_container = st.empty()
-                with st.spinner("Gemini Pro응답 생성 중..."):
-                    response = get_gemini_response(prompt)
-                    full_response = ""
-                    for chunk in response:
-                        full_response += chunk.text
+            st.subheader("Claude-3.5")
+            response_container = st.empty()
+            with st.spinner("Claude 응답 생성 중..."):
+                response = get_claude_response(prompt)
+                full_response = ""
+                for message in response:
+                    if message.type == 'content_block_delta':
+                        full_response += message.delta.text
                         response_container.markdown(full_response)
+            
+            st.subheader("Gemini Pro")
+            response_container = st.empty()
+            with st.spinner("Gemini Pro 응답 생성 중..."):
+                response = get_gemini_response(prompt)
+                full_response = ""
+                for chunk in response:
+                    full_response += chunk.text
+                    response_container.markdown(full_response)
         else:
             st.warning("프롬프트를 입력해주세요!")
 
