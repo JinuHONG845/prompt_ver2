@@ -99,17 +99,8 @@ def calculate_total_score(scores):
     # 10점 만점의 5개 항목을 100점 만점으로 환산
     return round((sum(actual_scores) / (10 * 5)) * 100, 1)
 
-def get_evaluation_prompt(responses, scores):
-    gpt_score = calculate_total_score(scores['gpt4'])
-    claude_score = calculate_total_score(scores['claude'])
-    gemini_score = calculate_total_score(scores['gemini'])
-    
+def get_evaluation_prompt(responses):
     return f"""다음은 동일한 질문에 대한 세 AI 모델의 응답입니다. 각 응답을 객관적으로 평가해주세요.
-
-평가 점수 (100점 만점):
-- GPT-4o: {gpt_score}점
-- Claude-3.5: {claude_score}점
-- Gemini Pro: {gemini_score}점
 
 질문: {responses['prompt']}
 
@@ -122,16 +113,24 @@ Claude-3.5의 응답:
 Gemini Pro의 응답:
 {responses['gemini']}
 
-위 점수와 응답들을 바탕으로 세 모델의 응답을 비교 분석하여 3줄로 간단히 총평해주세요. 각 모델의 장단점을 객관적으로 평가해주세요."""
+먼저 각 모델의 응답에 대해 100점 만점으로 점수를 매겨주세요. 다음과 같은 형식으로 작성해주세요:
 
-def get_summary_evaluation(model_name, responses, scores):
-    evaluation_prompt = get_evaluation_prompt(responses, scores)
+GPT-4o: [점수]/100
+Claude-3.5: [점수]/100
+Gemini Pro: [점수]/100
+
+[한 줄 띄우기]
+
+그런 다음, 세 모델의 응답을 비교 분석하여 3줄로 간단히 총평해주세요. 각 모델의 장단점을 객관적으로 평가해주세요."""
+
+def get_summary_evaluation(model_name, responses):
+    evaluation_prompt = get_evaluation_prompt(responses)
     
     if model_name == "GPT-4o":
         response = openai_client.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요."},
+                {"role": "system", "content": "당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요. 특히 100점 만점의 점수 평가를 정확하게 해주시고, 그 다음에 총평을 작성해주세요."},
                 {"role": "user", "content": evaluation_prompt}
             ],
             temperature=0.7,
@@ -144,7 +143,7 @@ def get_summary_evaluation(model_name, responses, scores):
             model="claude-3-sonnet-20240229",
             max_tokens=500,
             temperature=0.7,
-            system="당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요.",
+            system="당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요. 특히 100점 만점의 점수 평가를 정확하게 해주시고, 그 다음에 총평을 작성해주세요.",
             messages=[{"role": "user", "content": evaluation_prompt}]
         )
         return response.content[0].text
@@ -152,7 +151,7 @@ def get_summary_evaluation(model_name, responses, scores):
     else:  # Gemini Pro
         model = genai.GenerativeModel('gemini-pro')
         response = model.generate_content(
-            contents=f"""당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요.
+            contents=f"""당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요. 특히 100점 만점의 점수 평가를 정확하게 해주시고, 그 다음에 총평을 작성해주세요.
 
 {evaluation_prompt}""",
             generation_config=genai.types.GenerationConfig(
@@ -284,7 +283,7 @@ def main():
                 'gemini': gpt4_scores_gemini
             }
             with st.spinner("GPT-4o가 평가 중..."):
-                gpt4_evaluation = get_summary_evaluation("GPT-4o", responses, scores)
+                gpt4_evaluation = get_summary_evaluation("GPT-4o", responses)
                 st.markdown(f"""
                 <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px; margin: 10px 0;">
                 {gpt4_evaluation}
@@ -345,7 +344,7 @@ def main():
                 'gemini': claude_scores_gemini
             }
             with st.spinner("Claude-3.5가 평가 중..."):
-                claude_evaluation = get_summary_evaluation("Claude-3.5", responses, scores)
+                claude_evaluation = get_summary_evaluation("Claude-3.5", responses)
                 st.markdown(f"""
                 <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px; margin: 10px 0;">
                 {claude_evaluation}
@@ -406,7 +405,7 @@ def main():
                 'gemini': gemini_scores_gemini
             }
             with st.spinner("Gemini Pro가 평가 중..."):
-                gemini_evaluation = get_summary_evaluation("Gemini Pro", responses, scores)
+                gemini_evaluation = get_summary_evaluation("Gemini Pro", responses)
                 st.markdown(f"""
                 <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px; margin: 10px 0;">
                 {gemini_evaluation}
