@@ -87,11 +87,11 @@ Gemini Pro의 응답:
 
 세 모델의 응답을 비교 분석하여 3줄로 간단히 총평해주세요. 각 모델의 장단점을 객관적으로 평가해주세요."""
 
-async def get_summary_evaluation(model_name, responses):
+def get_summary_evaluation(model_name, responses):
     evaluation_prompt = get_evaluation_prompt(responses)
     
     if model_name == "GPT-4o":
-        response = await openai.chat.completions.create(
+        response = openai_client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요."},
@@ -103,7 +103,7 @@ async def get_summary_evaluation(model_name, responses):
         return response.choices[0].message.content
 
     elif model_name == "Claude-3.5":
-        response = await client.messages.create(
+        response = anthropic_client.messages.create(
             model="claude-3-sonnet-20240229",
             max_tokens=200,
             temperature=0.7,
@@ -113,7 +113,7 @@ async def get_summary_evaluation(model_name, responses):
         return response.content[0].text
 
     else:  # Gemini Pro
-        response = model.generate_content(
+        response = genai.GenerativeModel('gemini-pro').generate_content(
             prompt=f"""당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요.
 
 {evaluation_prompt}""",
@@ -208,7 +208,7 @@ def main():
                 'gemini': gemini_response
             }
             with st.spinner("GPT-4o가 평가 중..."):
-                gpt4_evaluation = await get_summary_evaluation("GPT-4o", responses)
+                gpt4_evaluation = get_summary_evaluation("GPT-4o", responses)
                 st.markdown(gpt4_evaluation)
 
             # Claude의 평가
@@ -227,7 +227,7 @@ def main():
             # Claude의 총평 추가
             st.markdown("#### Claude-3.5의 총평")
             with st.spinner("Claude-3.5가 평가 중..."):
-                claude_evaluation = await get_summary_evaluation("Claude-3.5", responses)
+                claude_evaluation = get_summary_evaluation("Claude-3.5", responses)
                 st.markdown(claude_evaluation)
 
             # Gemini의 평가
@@ -246,7 +246,7 @@ def main():
             # Gemini의 총평 추가
             st.markdown("#### Gemini Pro의 총평")
             with st.spinner("Gemini Pro가 평가 중..."):
-                gemini_evaluation = await get_summary_evaluation("Gemini Pro", responses)
+                gemini_evaluation = get_summary_evaluation("Gemini Pro", responses)
                 st.markdown(gemini_evaluation)
 
             # 평가 기준 설명
