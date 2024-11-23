@@ -93,8 +93,23 @@ def evaluate_response(response_text):
     scores = np.random.uniform(6, 10, 5)
     return np.append(scores, scores[0])  # 첫 번째 점수를 마지막에 추가
 
-def get_evaluation_prompt(responses):
+def calculate_total_score(scores):
+    # 마지막 점수는 첫 번째 점수의 반복이므로 제외
+    actual_scores = scores[:-1]
+    # 10점 만점의 5개 항목을 100점 만점으로 환산
+    return round((sum(actual_scores) / (10 * 5)) * 100, 1)
+
+def get_evaluation_prompt(responses, scores):
+    gpt_score = calculate_total_score(scores['gpt4'])
+    claude_score = calculate_total_score(scores['claude'])
+    gemini_score = calculate_total_score(scores['gemini'])
+    
     return f"""다음은 동일한 질문에 대한 세 AI 모델의 응답입니다. 각 응답을 객관적으로 평가해주세요.
+
+평가 점수 (100점 만점):
+- GPT-4o: {gpt_score}점
+- Claude-3.5: {claude_score}점
+- Gemini Pro: {gemini_score}점
 
 질문: {responses['prompt']}
 
@@ -107,10 +122,10 @@ Claude-3.5의 응답:
 Gemini Pro의 응답:
 {responses['gemini']}
 
-세 모델의 응답을 비교 분석하여 3줄로 간단히 총평해주세요. 각 모델의 장단점을 객관적으로 평가해주세요."""
+위 점수와 응답들을 바탕으로 세 모델의 응답을 비교 분석하여 3줄로 간단히 총평해주세요. 각 모델의 장단점을 객관적으로 평가해주세요."""
 
-def get_summary_evaluation(model_name, responses):
-    evaluation_prompt = get_evaluation_prompt(responses)
+def get_summary_evaluation(model_name, responses, scores):
+    evaluation_prompt = get_evaluation_prompt(responses, scores)
     
     if model_name == "GPT-4o":
         response = openai_client.chat.completions.create(
@@ -263,8 +278,13 @@ def main():
                 'claude': claude_response,
                 'gemini': gemini_response
             }
+            scores = {
+                'gpt4': gpt4_scores_gpt,
+                'claude': gpt4_scores_claude,
+                'gemini': gpt4_scores_gemini
+            }
             with st.spinner("GPT-4o가 평가 중..."):
-                gpt4_evaluation = get_summary_evaluation("GPT-4o", responses)
+                gpt4_evaluation = get_summary_evaluation("GPT-4o", responses, scores)
                 st.markdown(f"""
                 <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px; margin: 10px 0;">
                 {gpt4_evaluation}
@@ -319,8 +339,13 @@ def main():
             
             # Claude의 총평 추가
             st.markdown("#### Claude-3.5의 총평")
+            scores = {
+                'gpt4': claude_scores_gpt,
+                'claude': claude_scores_claude,
+                'gemini': claude_scores_gemini
+            }
             with st.spinner("Claude-3.5가 평가 중..."):
-                claude_evaluation = get_summary_evaluation("Claude-3.5", responses)
+                claude_evaluation = get_summary_evaluation("Claude-3.5", responses, scores)
                 st.markdown(f"""
                 <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px; margin: 10px 0;">
                 {claude_evaluation}
@@ -375,8 +400,13 @@ def main():
             
             # Gemini의 총평 추가
             st.markdown("#### Gemini Pro의 총평")
+            scores = {
+                'gpt4': gemini_scores_gpt,
+                'claude': gemini_scores_claude,
+                'gemini': gemini_scores_gemini
+            }
             with st.spinner("Gemini Pro가 평가 중..."):
-                gemini_evaluation = get_summary_evaluation("Gemini Pro", responses)
+                gemini_evaluation = get_summary_evaluation("Gemini Pro", responses, scores)
                 st.markdown(f"""
                 <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px; margin: 10px 0;">
                 {gemini_evaluation}
