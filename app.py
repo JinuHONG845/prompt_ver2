@@ -79,12 +79,12 @@ def main():
             with col2:
                 st.subheader("Claude-3.5")
                 response_container = st.empty()
-                with st.spinner("Claude-3.5 응답 생성 중..."):
+                with st.spinner("Claude 응답 생성 중..."):
                     response = get_claude_response(prompt)
                     full_response = ""
                     for chunk in response:
-                        if chunk.content:
-                            full_response += chunk.content[0].text
+                        if chunk.delta.text:
+                            full_response += chunk.delta.text
                             response_container.markdown(full_response)
             
             with col3:
