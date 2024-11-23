@@ -13,6 +13,19 @@ genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
 # 전역 변수로 categories 정의
 categories = ['정확성', '창의성', '논리성', '완성도', '유용성']
 
+# 전역 변수로 색상 정의
+CHART_COLORS = {
+    'GPT-4o': 'rgba(255, 107, 107, 1)',  # 선명한 빨간색
+    'Claude-3.5': 'rgba(255, 193, 69, 1)',  # 선명한 주황/노란색
+    'Gemini Pro': 'rgba(69, 183, 209, 1)'  # 하늘색
+}
+
+CHART_COLORS_FILL = {
+    'GPT-4o': 'rgba(255, 107, 107, 0.3)',
+    'Claude-3.5': 'rgba(255, 193, 69, 0.3)',
+    'Gemini Pro': 'rgba(69, 183, 209, 0.3)'
+}
+
 def get_gpt4_response(prompt):
     try:
         response = openai_client.chat.completions.create(
@@ -204,42 +217,29 @@ def main():
             
             fig_gpt = go.Figure()
             
-            # 각 모델별 색상 정의 (rgba 형식 사용)
-            colors = {
-                'GPT-4o': 'rgba(255, 107, 107, 1)',  # 선명한 빨간색
-                'Claude-3.5': 'rgba(255, 193, 69, 1)',  # 선명한 주황/노란색
-                'Gemini Pro': 'rgba(69, 183, 209, 1)'  # 하늘색
-            }
-            
-            colors_fill = {
-                'GPT-4o': 'rgba(255, 107, 107, 0.3)',  # 빨간색 투명
-                'Claude-3.5': 'rgba(255, 193, 69, 0.3)',  # 주황/노란색 투명
-                'Gemini Pro': 'rgba(69, 183, 209, 0.3)'  # 하늘색 투명
-            }
-            
             fig_gpt.add_trace(go.Scatterpolar(
                 r=gpt4_scores_gpt, 
                 theta=categories, 
                 fill='toself', 
                 name='GPT-4o', 
-                line=dict(color=colors['GPT-4o']), 
-                fillcolor=colors_fill['GPT-4o']
+                line=dict(color=CHART_COLORS['GPT-4o']), 
+                fillcolor=CHART_COLORS_FILL['GPT-4o']
             ))
             fig_gpt.add_trace(go.Scatterpolar(
                 r=gpt4_scores_claude, 
                 theta=categories, 
                 fill='toself', 
                 name='Claude-3.5', 
-                line=dict(color=colors['Claude-3.5']), 
-                fillcolor=colors_fill['Claude-3.5']
+                line=dict(color=CHART_COLORS['Claude-3.5']), 
+                fillcolor=CHART_COLORS_FILL['Claude-3.5']
             ))
             fig_gpt.add_trace(go.Scatterpolar(
                 r=gpt4_scores_gemini, 
                 theta=categories, 
                 fill='toself', 
                 name='Gemini Pro', 
-                line=dict(color=colors['Gemini Pro']), 
-                fillcolor=colors_fill['Gemini Pro']
+                line=dict(color=CHART_COLORS['Gemini Pro']), 
+                fillcolor=CHART_COLORS_FILL['Gemini Pro']
             ))
             
             fig_gpt.update_layout(
@@ -279,42 +279,29 @@ def main():
             
             fig_claude = go.Figure()
             
-            # 각 모델별 색상 정의 (rgba 형식 사용)
-            colors = {
-                'GPT-4o': 'rgba(255, 107, 107, 1)',  # 빨간색
-                'Claude-3.5': 'rgba(78, 205, 196, 1)',  # 청록색
-                'Gemini Pro': 'rgba(69, 183, 209, 1)'  # 하늘색
-            }
-            
-            colors_fill = {
-                'GPT-4o': 'rgba(255, 107, 107, 0.3)',  # 빨간색 투명
-                'Claude-3.5': 'rgba(78, 205, 196, 0.3)',  # 청록색 투명
-                'Gemini Pro': 'rgba(69, 183, 209, 0.3)'  # 하늘색 투명
-            }
-            
             fig_claude.add_trace(go.Scatterpolar(
                 r=claude_scores_gpt, 
                 theta=categories, 
                 fill='toself', 
                 name='GPT-4o', 
-                line=dict(color=colors['GPT-4o']), 
-                fillcolor=colors_fill['GPT-4o']
+                line=dict(color=CHART_COLORS['GPT-4o']), 
+                fillcolor=CHART_COLORS_FILL['GPT-4o']
             ))
             fig_claude.add_trace(go.Scatterpolar(
                 r=claude_scores_claude, 
                 theta=categories, 
                 fill='toself', 
                 name='Claude-3.5', 
-                line=dict(color=colors['Claude-3.5']), 
-                fillcolor=colors_fill['Claude-3.5']
+                line=dict(color=CHART_COLORS['Claude-3.5']), 
+                fillcolor=CHART_COLORS_FILL['Claude-3.5']
             ))
             fig_claude.add_trace(go.Scatterpolar(
                 r=claude_scores_gemini, 
                 theta=categories, 
                 fill='toself', 
                 name='Gemini Pro', 
-                line=dict(color=colors['Gemini Pro']), 
-                fillcolor=colors_fill['Gemini Pro']
+                line=dict(color=CHART_COLORS['Gemini Pro']), 
+                fillcolor=CHART_COLORS_FILL['Gemini Pro']
             ))
             
             fig_claude.update_layout(
@@ -348,42 +335,29 @@ def main():
             
             fig_gemini = go.Figure()
             
-            # 각 모델별 색상 정의 (rgba 형식 사용)
-            colors = {
-                'GPT-4o': 'rgba(255, 107, 107, 1)',  # 빨간색
-                'Claude-3.5': 'rgba(78, 205, 196, 1)',  # 청록색
-                'Gemini Pro': 'rgba(69, 183, 209, 1)'  # 하늘색
-            }
-            
-            colors_fill = {
-                'GPT-4o': 'rgba(255, 107, 107, 0.3)',  # 빨간색 투명
-                'Claude-3.5': 'rgba(78, 205, 196, 0.3)',  # 청록색 투명
-                'Gemini Pro': 'rgba(69, 183, 209, 0.3)'  # 하늘색 투명
-            }
-            
             fig_gemini.add_trace(go.Scatterpolar(
                 r=gemini_scores_gpt, 
                 theta=categories, 
                 fill='toself', 
                 name='GPT-4o', 
-                line=dict(color=colors['GPT-4o']), 
-                fillcolor=colors_fill['GPT-4o']
+                line=dict(color=CHART_COLORS['GPT-4o']), 
+                fillcolor=CHART_COLORS_FILL['GPT-4o']
             ))
             fig_gemini.add_trace(go.Scatterpolar(
                 r=gemini_scores_claude, 
                 theta=categories, 
                 fill='toself', 
                 name='Claude-3.5', 
-                line=dict(color=colors['Claude-3.5']), 
-                fillcolor=colors_fill['Claude-3.5']
+                line=dict(color=CHART_COLORS['Claude-3.5']), 
+                fillcolor=CHART_COLORS_FILL['Claude-3.5']
             ))
             fig_gemini.add_trace(go.Scatterpolar(
                 r=gemini_scores_gemini, 
                 theta=categories, 
                 fill='toself', 
                 name='Gemini Pro', 
-                line=dict(color=colors['Gemini Pro']), 
-                fillcolor=colors_fill['Gemini Pro']
+                line=dict(color=CHART_COLORS['Gemini Pro']), 
+                fillcolor=CHART_COLORS_FILL['Gemini Pro']
             ))
             
             fig_gemini.update_layout(
@@ -412,7 +386,7 @@ def main():
             # 평가 기준 설명
             st.subheader("평가 기준 설명")
             st.markdown("""
-            - **정확성**: 제공된 정보의 사실적 정확도와 신뢰���
+            - **정확성**: 제공된 정보의 사실적 정확도와 신뢰
             - **창의성**: 독창적이고 혁신적인 아이디어 제시 능력
             - **논리성**: 논리적 구조와 일관성 있는 설명
             - **완성도**: 응의 포괄성과 완결성
