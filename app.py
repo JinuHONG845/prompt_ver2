@@ -57,7 +57,7 @@ def create_radar_chart(scores, model_name):
         polar=dict(
             radialaxis=dict(
                 visible=True,
-                range=[0, 5]
+                range=[0, 10]
             )),
         showlegend=True,
         title=f"{model_name} 응답 평가"
@@ -68,7 +68,7 @@ def create_radar_chart(scores, model_name):
 def evaluate_response(response_text):
     # 실제 프로덕션에서는 이 부분을 더 정교한 평가 로직으로 대체해야 합니다
     # 현재는 예시로 랜덤 점수를 생성합니다
-    return np.random.uniform(3, 5, 5)
+    return np.random.uniform(6, 10, 5)
 
 def main():
     # CSS로 레이아웃 조정
@@ -126,21 +126,50 @@ def main():
                     gemini_response += chunk.text
                     gemini_container.markdown(gemini_response)
 
+            # 구분선 추가
+            st.markdown("---")
+
             # 응답 평가 및 레이더 차트 표시
             st.subheader("응답 평가")
-            col1, col2, col3 = st.columns(3)
             
-            with col1:
-                gpt4_scores = evaluate_response(gpt4_response)
-                st.plotly_chart(create_radar_chart(gpt4_scores, "GPT-4o"), use_container_width=True)
+            # GPT-4o의 평가
+            st.markdown("### GPT-4o의 평가")
+            gpt4_scores_gpt = evaluate_response(gpt4_response)
+            gpt4_scores_claude = evaluate_response(claude_response)
+            gpt4_scores_gemini = evaluate_response(gemini_response)
             
-            with col2:
-                claude_scores = evaluate_response(claude_response)
-                st.plotly_chart(create_radar_chart(claude_scores, "Claude-3.5"), use_container_width=True)
+            fig_gpt = go.Figure()
+            fig_gpt.add_trace(go.Scatterpolar(r=gpt4_scores_gpt, theta=categories, fill='toself', name='GPT-4o'))
+            fig_gpt.add_trace(go.Scatterpolar(r=gpt4_scores_claude, theta=categories, fill='toself', name='Claude-3.5'))
+            fig_gpt.add_trace(go.Scatterpolar(r=gpt4_scores_gemini, theta=categories, fill='toself', name='Gemini Pro'))
+            fig_gpt.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 10])), title="GPT-4o의 평가 결과")
+            st.plotly_chart(fig_gpt, use_container_width=True)
+
+            # Claude의 평가
+            st.markdown("### Claude-3.5의 평가")
+            claude_scores_gpt = evaluate_response(gpt4_response)
+            claude_scores_claude = evaluate_response(claude_response)
+            claude_scores_gemini = evaluate_response(gemini_response)
             
-            with col3:
-                gemini_scores = evaluate_response(gemini_response)
-                st.plotly_chart(create_radar_chart(gemini_scores, "Gemini Pro"), use_container_width=True)
+            fig_claude = go.Figure()
+            fig_claude.add_trace(go.Scatterpolar(r=claude_scores_gpt, theta=categories, fill='toself', name='GPT-4o'))
+            fig_claude.add_trace(go.Scatterpolar(r=claude_scores_claude, theta=categories, fill='toself', name='Claude-3.5'))
+            fig_claude.add_trace(go.Scatterpolar(r=claude_scores_gemini, theta=categories, fill='toself', name='Gemini Pro'))
+            fig_claude.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 10])), title="Claude-3.5의 평가 결과")
+            st.plotly_chart(fig_claude, use_container_width=True)
+
+            # Gemini의 평가
+            st.markdown("### Gemini Pro의 평가")
+            gemini_scores_gpt = evaluate_response(gpt4_response)
+            gemini_scores_claude = evaluate_response(claude_response)
+            gemini_scores_gemini = evaluate_response(gemini_response)
+            
+            fig_gemini = go.Figure()
+            fig_gemini.add_trace(go.Scatterpolar(r=gemini_scores_gpt, theta=categories, fill='toself', name='GPT-4o'))
+            fig_gemini.add_trace(go.Scatterpolar(r=gemini_scores_claude, theta=categories, fill='toself', name='Claude-3.5'))
+            fig_gemini.add_trace(go.Scatterpolar(r=gemini_scores_gemini, theta=categories, fill='toself', name='Gemini Pro'))
+            fig_gemini.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 10])), title="Gemini Pro의 평가 결과")
+            st.plotly_chart(fig_gemini, use_container_width=True)
 
             # 평가 기준 설명
             st.subheader("평가 기준 설명")
