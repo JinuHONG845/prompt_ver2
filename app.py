@@ -98,14 +98,14 @@ def get_summary_evaluation(model_name, responses):
                 {"role": "user", "content": evaluation_prompt}
             ],
             temperature=0.7,
-            max_tokens=200
+            max_tokens=500
         )
         return response.choices[0].message.content
 
     elif model_name == "Claude-3.5":
         response = anthropic_client.messages.create(
             model="claude-3-sonnet-20240229",
-            max_tokens=200,
+            max_tokens=500,
             temperature=0.7,
             system="당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요.",
             messages=[{"role": "user", "content": evaluation_prompt}]
@@ -119,7 +119,7 @@ def get_summary_evaluation(model_name, responses):
 {evaluation_prompt}""",
             generation_config=genai.types.GenerationConfig(
                 temperature=0.7,
-                max_output_tokens=200,
+                max_output_tokens=500,
             )
         )
         return response.text
@@ -209,7 +209,11 @@ def main():
             }
             with st.spinner("GPT-4o가 평가 중..."):
                 gpt4_evaluation = get_summary_evaluation("GPT-4o", responses)
-                st.markdown(gpt4_evaluation)
+                st.markdown(f"""
+                <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px; margin: 10px 0;">
+                {gpt4_evaluation}
+                </div>
+                """, unsafe_allow_html=True)
 
             # Claude의 평가
             st.markdown("### Claude-3.5의 평가")
@@ -228,7 +232,11 @@ def main():
             st.markdown("#### Claude-3.5의 총평")
             with st.spinner("Claude-3.5가 평가 중..."):
                 claude_evaluation = get_summary_evaluation("Claude-3.5", responses)
-                st.markdown(claude_evaluation)
+                st.markdown(f"""
+                <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px; margin: 10px 0;">
+                {claude_evaluation}
+                </div>
+                """, unsafe_allow_html=True)
 
             # Gemini의 평가
             st.markdown("### Gemini Pro의 평가")
@@ -247,7 +255,11 @@ def main():
             st.markdown("#### Gemini Pro의 총평")
             with st.spinner("Gemini Pro가 평가 중..."):
                 gemini_evaluation = get_summary_evaluation("Gemini Pro", responses)
-                st.markdown(gemini_evaluation)
+                st.markdown(f"""
+                <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px; margin: 10px 0;">
+                {gemini_evaluation}
+                </div>
+                """, unsafe_allow_html=True)
 
             # 평가 기준 설명
             st.subheader("평가 기준 설명")
