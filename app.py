@@ -113,13 +113,8 @@ Claude-3.5의 응답:
 Gemini Pro의 응답:
 {responses['gemini']}
 
-먼저 각 모델의 응답에 대해 100점 만점으로 점수를 매겨주세요. 다음과 같은 형식으로 작성해주세요:
-
-GPT-4o: [점수]/100
-Claude-3.5: [점수]/100
-Gemini Pro: [점수]/100
-
-[한 줄 띄우기]
+먼저 아래 형식으로 정확히 점수를 매겨주세요:
+[GPT-4o: XX점, Claude-3.5: XX점, Gemini Pro: XX점 (100점 만점 기준)]
 
 그런 다음, 세 모델의 응답을 비교 분석하여 3줄로 간단히 총평해주세요. 각 모델의 장단점을 객관적으로 평가해주세요."""
 
@@ -130,11 +125,12 @@ def get_summary_evaluation(model_name, responses):
         response = openai_client.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요. 특히 100점 만점의 점수 평가를 정확하게 해주시고, 그 다음에 총평을 작성해주세요."},
+                {"role": "system", "content": "당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요. 점수는 반드시 지정된 형식으로 작성하고, 이어서 3줄의 간단한 총평을 작성해주세요."},
                 {"role": "user", "content": evaluation_prompt}
             ],
             temperature=0.7,
-            max_tokens=500
+            max_tokens=500,
+            stream=False  # streaming을 비활성화하여 한 번에 응답 받기
         )
         return response.choices[0].message.content
 
