@@ -204,30 +204,55 @@ def main():
             
             fig_gpt = go.Figure()
             
-            # 각 모델별 색상 정의
+            # 각 모델별 색상 정의 (rgba 형식 사용)
             colors = {
-                'GPT-4o': '#FF6B6B',  # 선명한 빨간색
-                'Claude-3.5': '#4ECDC4',  # 청록색
-                'Gemini Pro': '#45B7D1'  # 하늘색
+                'GPT-4o': 'rgba(255, 107, 107, 1)',  # 빨간색
+                'Claude-3.5': 'rgba(78, 205, 196, 1)',  # 청록색
+                'Gemini Pro': 'rgba(69, 183, 209, 1)'  # 하늘색
+            }
+            
+            colors_fill = {
+                'GPT-4o': 'rgba(255, 107, 107, 0.3)',  # 빨간색 투명
+                'Claude-3.5': 'rgba(78, 205, 196, 0.3)',  # 청록색 투명
+                'Gemini Pro': 'rgba(69, 183, 209, 0.3)'  # 하늘색 투명
             }
             
             fig_gpt.add_trace(go.Scatterpolar(
-                r=gpt4_scores_gpt, theta=categories, fill='toself', 
-                name='GPT-4o', line=dict(color=colors['GPT-4o']), 
-                fillcolor=colors['GPT-4o'] + '50'
+                r=gpt4_scores_gpt, 
+                theta=categories, 
+                fill='toself', 
+                name='GPT-4o', 
+                line=dict(color=colors['GPT-4o']), 
+                fillcolor=colors_fill['GPT-4o']
             ))
             fig_gpt.add_trace(go.Scatterpolar(
-                r=gpt4_scores_claude, theta=categories, fill='toself', 
-                name='Claude-3.5', line=dict(color=colors['Claude-3.5']), 
-                fillcolor=colors['Claude-3.5'] + '50'
+                r=gpt4_scores_claude, 
+                theta=categories, 
+                fill='toself', 
+                name='Claude-3.5', 
+                line=dict(color=colors['Claude-3.5']), 
+                fillcolor=colors_fill['Claude-3.5']
             ))
             fig_gpt.add_trace(go.Scatterpolar(
-                r=gpt4_scores_gemini, theta=categories, fill='toself', 
-                name='Gemini Pro', line=dict(color=colors['Gemini Pro']), 
-                fillcolor=colors['Gemini Pro'] + '50'
+                r=gpt4_scores_gemini, 
+                theta=categories, 
+                fill='toself', 
+                name='Gemini Pro', 
+                line=dict(color=colors['Gemini Pro']), 
+                fillcolor=colors_fill['Gemini Pro']
             ))
             
-            fig_gpt.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 10])), title="GPT-4o의 평가 결과")
+            fig_gpt.update_layout(
+                polar=dict(
+                    radialaxis=dict(
+                        visible=True,
+                        range=[0, 10]
+                    )
+                ),
+                showlegend=True,
+                title="GPT-4o의 평가 결과"
+            )
+            
             st.plotly_chart(fig_gpt, use_container_width=True)
             
             # GPT-4o의 총평 추가
@@ -254,30 +279,55 @@ def main():
             
             fig_claude = go.Figure()
             
-            # 각 모델별 색상 정의
+            # 각 모델별 색상 정의 (rgba 형식 사용)
             colors = {
-                'GPT-4o': '#FF6B6B',  # 선명한 빨간색
-                'Claude-3.5': '#4ECDC4',  # 청록색
-                'Gemini Pro': '#45B7D1'  # 하늘색
+                'GPT-4o': 'rgba(255, 107, 107, 1)',  # 빨간색
+                'Claude-3.5': 'rgba(78, 205, 196, 1)',  # 청록색
+                'Gemini Pro': 'rgba(69, 183, 209, 1)'  # 하늘색
+            }
+            
+            colors_fill = {
+                'GPT-4o': 'rgba(255, 107, 107, 0.3)',  # 빨간색 투명
+                'Claude-3.5': 'rgba(78, 205, 196, 0.3)',  # 청록색 투명
+                'Gemini Pro': 'rgba(69, 183, 209, 0.3)'  # 하늘색 투명
             }
             
             fig_claude.add_trace(go.Scatterpolar(
-                r=claude_scores_gpt, theta=categories, fill='toself', 
-                name='GPT-4o', line=dict(color=colors['GPT-4o']), 
-                fillcolor=colors['GPT-4o'] + '50'
+                r=claude_scores_gpt, 
+                theta=categories, 
+                fill='toself', 
+                name='GPT-4o', 
+                line=dict(color=colors['GPT-4o']), 
+                fillcolor=colors_fill['GPT-4o']
             ))
             fig_claude.add_trace(go.Scatterpolar(
-                r=claude_scores_claude, theta=categories, fill='toself', 
-                name='Claude-3.5', line=dict(color=colors['Claude-3.5']), 
-                fillcolor=colors['Claude-3.5'] + '50'
+                r=claude_scores_claude, 
+                theta=categories, 
+                fill='toself', 
+                name='Claude-3.5', 
+                line=dict(color=colors['Claude-3.5']), 
+                fillcolor=colors_fill['Claude-3.5']
             ))
             fig_claude.add_trace(go.Scatterpolar(
-                r=claude_scores_gemini, theta=categories, fill='toself', 
-                name='Gemini Pro', line=dict(color=colors['Gemini Pro']), 
-                fillcolor=colors['Gemini Pro'] + '50'
+                r=claude_scores_gemini, 
+                theta=categories, 
+                fill='toself', 
+                name='Gemini Pro', 
+                line=dict(color=colors['Gemini Pro']), 
+                fillcolor=colors_fill['Gemini Pro']
             ))
             
-            fig_claude.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 10])), title="Claude-3.5의 평가 결과")
+            fig_claude.update_layout(
+                polar=dict(
+                    radialaxis=dict(
+                        visible=True,
+                        range=[0, 10]
+                    )
+                ),
+                showlegend=True,
+                title="Claude-3.5의 평가 결과"
+            )
+            
             st.plotly_chart(fig_claude, use_container_width=True)
             
             # Claude의 총평 추가
@@ -298,30 +348,55 @@ def main():
             
             fig_gemini = go.Figure()
             
-            # 각 모델별 색상 정의
+            # 각 모델별 색상 정의 (rgba 형식 사용)
             colors = {
-                'GPT-4o': '#FF6B6B',  # 선명한 빨간색
-                'Claude-3.5': '#4ECDC4',  # 청록색
-                'Gemini Pro': '#45B7D1'  # 하늘색
+                'GPT-4o': 'rgba(255, 107, 107, 1)',  # 빨간색
+                'Claude-3.5': 'rgba(78, 205, 196, 1)',  # 청록색
+                'Gemini Pro': 'rgba(69, 183, 209, 1)'  # 하늘색
+            }
+            
+            colors_fill = {
+                'GPT-4o': 'rgba(255, 107, 107, 0.3)',  # 빨간색 투명
+                'Claude-3.5': 'rgba(78, 205, 196, 0.3)',  # 청록색 투명
+                'Gemini Pro': 'rgba(69, 183, 209, 0.3)'  # 하늘색 투명
             }
             
             fig_gemini.add_trace(go.Scatterpolar(
-                r=gemini_scores_gpt, theta=categories, fill='toself', 
-                name='GPT-4o', line=dict(color=colors['GPT-4o']), 
-                fillcolor=colors['GPT-4o'] + '50'
+                r=gemini_scores_gpt, 
+                theta=categories, 
+                fill='toself', 
+                name='GPT-4o', 
+                line=dict(color=colors['GPT-4o']), 
+                fillcolor=colors_fill['GPT-4o']
             ))
             fig_gemini.add_trace(go.Scatterpolar(
-                r=gemini_scores_claude, theta=categories, fill='toself', 
-                name='Claude-3.5', line=dict(color=colors['Claude-3.5']), 
-                fillcolor=colors['Claude-3.5'] + '50'
+                r=gemini_scores_claude, 
+                theta=categories, 
+                fill='toself', 
+                name='Claude-3.5', 
+                line=dict(color=colors['Claude-3.5']), 
+                fillcolor=colors_fill['Claude-3.5']
             ))
             fig_gemini.add_trace(go.Scatterpolar(
-                r=gemini_scores_gemini, theta=categories, fill='toself', 
-                name='Gemini Pro', line=dict(color=colors['Gemini Pro']), 
-                fillcolor=colors['Gemini Pro'] + '50'
+                r=gemini_scores_gemini, 
+                theta=categories, 
+                fill='toself', 
+                name='Gemini Pro', 
+                line=dict(color=colors['Gemini Pro']), 
+                fillcolor=colors_fill['Gemini Pro']
             ))
             
-            fig_gemini.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 10])), title="Gemini Pro의 평가 결과")
+            fig_gemini.update_layout(
+                polar=dict(
+                    radialaxis=dict(
+                        visible=True,
+                        range=[0, 10]
+                    )
+                ),
+                showlegend=True,
+                title="Gemini Pro의 평가 결과"
+            )
+            
             st.plotly_chart(fig_gemini, use_container_width=True)
             
             # Gemini의 총평 추가
@@ -340,7 +415,7 @@ def main():
             - **정확성**: 제공된 정보의 사실적 정확도와 신뢰성
             - **창의성**: 독창적이고 혁신적인 아이디어 제시 능력
             - **논리성**: 논리적 구조와 일관성 있는 설명
-            - **완성도**: 응답의 포괄성과 완결성
+            - **완성도**: 응��의 포괄성과 완결성
             - **유용성**: 실제 적용 가능성과 실용적 가치
             """)
         else:
