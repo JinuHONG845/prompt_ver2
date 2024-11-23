@@ -113,8 +113,9 @@ def get_summary_evaluation(model_name, responses):
         return response.content[0].text
 
     else:  # Gemini Pro
-        response = genai.GenerativeModel('gemini-pro').generate_content(
-            prompt=f"""당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요.
+        model = genai.GenerativeModel('gemini-pro')
+        response = model.generate_content(
+            contents=f"""당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요.
 
 {evaluation_prompt}""",
             generation_config=genai.types.GenerationConfig(
