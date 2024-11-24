@@ -29,7 +29,7 @@ CHART_COLORS_FILL = {
 def get_gpt4_response(prompt):
     try:
         response = openai_client.chat.completions.create(
-            model="gpt-4-0125-preview",
+            model="gpt-4-turbo",
             messages=[{"role": "user", "content": prompt}],
             stream=True
         )
@@ -41,6 +41,7 @@ def get_claude_response(prompt):
     try:
         message = anthropic_client.messages.create(
             model="claude-3-sonnet-20240229",
+            max_tokens=1000,
             messages=[{"role": "user", "content": prompt}],
             stream=True
         )
@@ -51,13 +52,7 @@ def get_claude_response(prompt):
 def get_gemini_response(prompt):
     try:
         model = genai.GenerativeModel('gemini-pro')
-        response = model.generate_content(
-            prompt,
-            generation_config=genai.types.GenerationConfig(
-                temperature=0.7,
-            ),
-            stream=True
-        )
+        response = model.generate_content(prompt, stream=True)
         return response
     except Exception as e:
         return f"Gemini Error: {str(e)}"
@@ -128,24 +123,24 @@ def get_summary_evaluation(model_name, responses):
     
     if model_name == "GPT-4o":
         response = openai_client.chat.completions.create(
-            model="gpt-4-0125-preview",
+            model="gpt-4-turbo",
             messages=[
-                {"role": "system", "content": "당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요. 점수는 반드시 지정된 형식으로 작성하고, 이어서 3줄의 간단한 평을 작성해주세요."},
+                {"role": "system", "content": "당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요. 점수는 반드시 지정된 형식으로 작성하고, 이어서 3줄의 간단한 총평을 작성해주세요."},
                 {"role": "user", "content": evaluation_prompt}
             ],
             temperature=0.7,
-            stream=False
+            max_tokens=500,
+            stream=False  # streaming을 비활성화하여 한 번에 응답 받기
         )
         return response.choices[0].message.content
 
     elif model_name == "Claude-3.5":
         response = anthropic_client.messages.create(
             model="claude-3-sonnet-20240229",
+            max_tokens=500,
             temperature=0.7,
-            messages=[
-                {"role": "system", "content": "당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요. 특히 100점 만점의 점수 평가를 정확하게 해주시고, 그 다음에 총평을 작성해주세요."},
-                {"role": "user", "content": evaluation_prompt}
-            ]
+            system="당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요. 특히 100점 만점의 점수 평가를 정확하게 해주시고, 그 다음에 총평을 작성해주세요.",
+            messages=[{"role": "user", "content": evaluation_prompt}]
         )
         return response.content[0].text
 
@@ -157,6 +152,7 @@ def get_summary_evaluation(model_name, responses):
 {evaluation_prompt}""",
             generation_config=genai.types.GenerationConfig(
                 temperature=0.7,
+                max_output_tokens=500,
             )
         )
         return response.text
@@ -203,7 +199,7 @@ def main():
             with st.spinner("Claude 응답 생성 중..."):
                 response = get_claude_response(prompt)
                 for message in response:
-                    if hasattr(message, 'delta') and message.delta.text:
+                    if message.type == 'content_block_delta':
                         claude_response += message.delta.text
                         claude_container.markdown(claude_response)
             
