@@ -31,7 +31,6 @@ def get_gpt4_response(prompt):
         response = openai_client.chat.completions.create(
             model="gpt-4-turbo",
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=1000,
             stream=True
         )
         return response
@@ -42,7 +41,6 @@ def get_claude_response(prompt):
     try:
         message = anthropic_client.messages.create(
             model="claude-3-sonnet-20240229",
-            max_tokens=1000,
             messages=[{"role": "user", "content": prompt}],
             stream=True
         )
@@ -56,7 +54,6 @@ def get_gemini_response(prompt):
         response = model.generate_content(
             prompt,
             generation_config=genai.types.GenerationConfig(
-                max_output_tokens=1000,
                 temperature=0.7,
             ),
             stream=True
@@ -133,7 +130,7 @@ def get_summary_evaluation(model_name, responses):
         response = openai_client.chat.completions.create(
             model="gpt-4-turbo",
             messages=[
-                {"role": "system", "content": "당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요. 점수는 반드시 지정된 형식으로 작성하고, 이어서 3줄의 간단한 ���평을 작성해주세요."},
+                {"role": "system", "content": "당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요. 점수는 반드시 지정된 형식으로 작성하고, 이어서 3줄의 간단한 평을 작성해주세요."},
                 {"role": "user", "content": evaluation_prompt}
             ],
             temperature=0.7,
