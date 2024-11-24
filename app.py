@@ -134,7 +134,6 @@ def get_summary_evaluation(model_name, responses):
                 {"role": "user", "content": evaluation_prompt}
             ],
             temperature=0.7,
-            max_tokens=1000,
             stream=False
         )
         return response.choices[0].message.content
@@ -143,8 +142,10 @@ def get_summary_evaluation(model_name, responses):
         response = anthropic_client.messages.create(
             model="claude-3-sonnet-20240229",
             temperature=0.7,
-            system="당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요. 특히 100점 만점의 점수 평가를 정확하게 해주시고, 그 다음에 총평을 작성해주세요.",
-            messages=[{"role": "user", "content": evaluation_prompt}]
+            messages=[
+                {"role": "system", "content": "당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요. 특히 100점 만점의 점수 평가를 정확하게 해주시고, 그 다음에 총평을 작성해주세요."},
+                {"role": "user", "content": evaluation_prompt}
+            ]
         )
         return response.content[0].text
 
@@ -156,7 +157,6 @@ def get_summary_evaluation(model_name, responses):
 {evaluation_prompt}""",
             generation_config=genai.types.GenerationConfig(
                 temperature=0.7,
-                max_output_tokens=1000,
             )
         )
         return response.text
