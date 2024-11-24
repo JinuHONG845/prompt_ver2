@@ -203,7 +203,7 @@ def main():
             with st.spinner("Claude 응답 생성 중..."):
                 response = get_claude_response(prompt)
                 for message in response:
-                    if message.type == 'content_block_delta':
+                    if hasattr(message, 'delta') and message.delta.text:
                         claude_response += message.delta.text
                         claude_container.markdown(claude_response)
             
