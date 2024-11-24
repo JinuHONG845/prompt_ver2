@@ -29,7 +29,7 @@ CHART_COLORS_FILL = {
 def get_gpt4_response(prompt):
     try:
         response = openai_client.chat.completions.create(
-            model="gpt-4-turbo",
+            model="gpt-4-0125-preview",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=1000,
             stream=True
@@ -131,7 +131,7 @@ def get_summary_evaluation(model_name, responses):
     
     if model_name == "GPT-4o":
         response = openai_client.chat.completions.create(
-            model="gpt-4-turbo",
+            model="gpt-4-0125-preview",
             messages=[
                 {"role": "system", "content": "당신은 AI 응답을 분석하고 평가하는 전문가입니다. 객관적이고 공정한 평가를 제공해주세요. 점수는 반드시 지정된 형식으로 작성하고, 이어서 3줄의 간단한 ���평을 작성해주세요."},
                 {"role": "user", "content": evaluation_prompt}
