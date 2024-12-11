@@ -18,8 +18,12 @@ try:
         st.error("Google API 키가 설정되지 않았습니다.")
         st.stop()
 
-    openai_client = OpenAI()  # 환경 변수에서 자동으로 가져옴
+    # OpenAI 클라이언트 초기화 방식 변경
     os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
+    openai_client = OpenAI(
+        api_key=st.secrets["OPENAI_API_KEY"],
+        base_url="https://api.openai.com/v1"
+    )
     
     anthropic_client = Anthropic(api_key=st.secrets["ANTHROPIC_API_KEY"])
     genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
@@ -107,7 +111,7 @@ def create_radar_chart(scores, model_name):
     return fig
 
 def evaluate_response(response_text):
-    # 5개의 점수를 생성하고 첫 번째 점수를 마지막에 반복
+    # 5개의 ��수를 생성하고 첫 번째 점수를 마지막에 반복
     scores = np.random.uniform(6, 10, 5)
     return np.append(scores, scores[0])  # 첫 번째 점수를 마지막에 추가
 
