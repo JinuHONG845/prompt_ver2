@@ -4,11 +4,29 @@ from anthropic import Anthropic
 import google.generativeai as genai
 import plotly.graph_objects as go
 import numpy as np
+import os
 
-# API 키 설정
-openai_client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-anthropic_client = Anthropic(api_key=st.secrets["ANTHROPIC_API_KEY"])
-genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
+# API 키 설정 및 에러 처리
+try:
+    if "OPENAI_API_KEY" not in st.secrets:
+        st.error("OpenAI API 키가 설정되지 않았습니다.")
+        st.stop()
+    if "ANTHROPIC_API_KEY" not in st.secrets:
+        st.error("Anthropic API 키가 설정되지 않았습니다.")
+        st.stop()
+    if "GOOGLE_API_KEY" not in st.secrets:
+        st.error("Google API 키가 설정되지 않았습니다.")
+        st.stop()
+
+    openai_client = OpenAI()  # 환경 변수에서 자동으로 가져옴
+    os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
+    
+    anthropic_client = Anthropic(api_key=st.secrets["ANTHROPIC_API_KEY"])
+    genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
+    
+except Exception as e:
+    st.error(f"API 초기화 중 오류 발생: {str(e)}")
+    st.stop()
 
 # 전역 변수로 categories 정의
 categories = ['정확성', '창의성', '논리성', '완성도', '유용성', '정확성']
